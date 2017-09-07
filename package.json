@@ -1,0 +1,22 @@
+{
+  "name": "probot-kv",
+  "version": "1.0.0",
+  "description": "Hack to key/value support to GitHub Issues & Pull Requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/probot/kv.git"
+  },
+  "keywords": [
+    "probot"
+  ],
+  "author": "Brandon Keepers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/probot/kv/issues"
+  },
+  "homepage": "https://github.com/probot/kv#readme"
+}
