@@ -7,7 +7,8 @@ module.exports = (github, issue, prefix) => {
       const match = res.data.body.match(regex)
 
       if (match) {
-        return JSON.parse(match[1])[prefix][key]
+        const data = JSON.parse(match[1])
+        return data[prefix] && data[prefix][key]
       }
     },
 

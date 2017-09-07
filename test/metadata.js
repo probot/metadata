@@ -86,4 +86,31 @@ describe('metadata', () => {
       })
     })
   })
+
+  describe('on issue with metadata for a different prefix', () => {
+    beforeEach(() => {
+      github.issues.get.andReturn(Promise.resolve({
+        data: {body: 'original post\n\n<!-- probot = {"otherprefix":{"key":"value"}} -->'}
+      }))
+    })
+
+    describe('set', () => {
+      it('sets new metadata', async () => {
+        await kv.set('hello', 'world')
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'original post\n\n<!-- probot = {"otherprefix":{"key":"value"},"prefix":{"hello":"world"}} -->'
+        })
+      })
+    })
+
+    describe('get', () => {
+      it('returns null for unknown key', async () => {
+        expect(await kv.get('unknown')).toEqual(null)
+      })
+    })
+  })
 })
