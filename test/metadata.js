@@ -113,4 +113,39 @@ describe('metadata', () => {
       })
     })
   })
+
+  describe('when given body in issue params', () => {
+    beforeEach(() => {
+      const issue = {
+        owner: 'foo',
+        repo: 'bar',
+        number: 42,
+        body: 'hello world\n\n<!-- probot = {"prefix":{"hello":"world"}} -->'
+      }
+
+      kv = metadata(github, issue, 'prefix')
+    })
+
+    describe('get', () => {
+      it('returns the value without an API call', async () => {
+        expect(await kv.get('hello')).toEqual('world')
+        expect(github.issues.get).toNotHaveBeenCalled()
+      })
+    })
+
+    describe('set', () => {
+      it('updates the value without an API call', async () => {
+        await kv.set('foo', 'bar')
+
+        expect(github.issues.get).toNotHaveBeenCalled()
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'hello world\n\n<!-- probot = {"prefix":{"hello":"world","foo":"bar"}} -->'
+        })
+      })
+    })
+  })
 })
