@@ -1,7 +1,7 @@
 {
   "name": "probot-metadata",
   "version": "1.0.0",
-  "description": "Hack to key/value support to GitHub Issues & Pull Requests",
+  "description": "A Probot extension to store metadata on Issues and Pull Requests",
   "main": "index.js",
   "scripts": {
     "test": "mocha && standard"

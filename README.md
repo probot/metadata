@@ -1,15 +1,17 @@
 # Probot: metadata
 
-A [Probot](https://github.com/probot/probot) extension to store metadata on an Issue and Pull Request.
+A [Probot](https://github.com/probot/probot) extension to store metadata on Issues and Pull Requests.
 
 ## Usage
 
 ```js
 const metadata = require('probot-metadata');
 
-// where `context` is either a Probot `Context`, or an object with `owner`, `repo`, and `number values`
-metadata.set(context, key, value);
-const value = await metadata.get(context, key)
+// where `context` is a Probot `Context`
+const kv = metadata(context.github, context.issue())
+
+kv.set(key, value)
+const value = await kv.get(key)
 ```
 
 ## Example
@@ -19,9 +21,11 @@ const metadata = require('probot-metadata');
 
 module.exports = robot => {
   robot.on('issue_comment.created', context => {
+    const kv = metadata(context.github, context.issue())
+
     match = context.payload.comment.body.match('/snooze (.*)')
     if(match) {
-      metadata.set(context, 'snooze', match[1]);
+      kv.set(context, 'snooze', match[1]);
     }
   })
 }
