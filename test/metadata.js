@@ -15,7 +15,7 @@ describe('metadata', () => {
       }
     }
 
-    kv = metadata(github, {owner: 'foo', repo: 'bar', number: 42})
+    kv = metadata(github, {owner: 'foo', repo: 'bar', number: 42}, 'prefix')
   })
 
   describe('on issue without metdata', () => {
@@ -33,7 +33,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"key":"value"} -->'
+          body: 'original post\n\n<!-- probot = {"prefix":{"key":"value"}} -->'
         })
       })
     })
@@ -48,7 +48,7 @@ describe('metadata', () => {
   describe('on issue with existing metadata', () => {
     beforeEach(() => {
       github.issues.get.andReturn(Promise.resolve({
-        data: {body: 'original post\n\n<!-- probot = {"key":"value"} -->'}
+        data: {body: 'original post\n\n<!-- probot = {"prefix":{"key":"value"}} -->'}
       }))
     })
 
@@ -60,7 +60,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"key":"value","hello":"world"} -->'
+          body: 'original post\n\n<!-- probot = {"prefix":{"key":"value","hello":"world"}} -->'
         })
       })
 
@@ -71,7 +71,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"key":"new value"} -->'
+          body: 'original post\n\n<!-- probot = {"prefix":{"key":"new value"}} -->'
         })
       })
     })
