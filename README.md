@@ -10,7 +10,7 @@ const metadata = require('probot-metadata');
 // where `context` is a Probot `Context`
 const kv = metadata(context.github, context.issue())
 
-kv.set(key, value)
+await kv.set(key, value)
 const value = await kv.get(key)
 ```
 
