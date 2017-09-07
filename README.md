@@ -25,7 +25,7 @@ module.exports = robot => {
 
     match = context.payload.comment.body.match('/snooze (.*)')
     if(match) {
-      kv.set(context, 'snooze', match[1]);
+      kv.set('snooze', match[1]);
     }
   })
 }
