@@ -1,9 +1,9 @@
 const expect = require('expect')
 const metadata = require('..')
+const Context = require('probot/lib/context')
 
 describe('metadata', () => {
-  let github
-  let kv
+  let context, event, github
 
   beforeEach(() => {
     github = {
@@ -15,7 +15,18 @@ describe('metadata', () => {
       }
     }
 
-    kv = metadata(github, {owner: 'foo', repo: 'bar', number: 42}, 'prefix')
+    event = {
+      payload: {
+        issue: {number: 42},
+        repository: {
+          owner: {login: 'foo'},
+          name: 'bar'
+        },
+        installation: {id: 1}
+      }
+    }
+
+    context = new Context(event, github)
   })
 
   describe('on issue without metdata', () => {
@@ -26,21 +37,36 @@ describe('metadata', () => {
     })
 
     describe('set', () => {
-      it('sets metadata', async () => {
-        await kv.set('key', 'value')
+      it('sets a key', async () => {
+        await metadata(context).set('key', 'value')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"prefix":{"key":"value"}} -->'
+          body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
+        })
+      })
+
+      it('sets an object', async () => {
+        await metadata(context).set({key: 'value'})
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
         })
       })
     })
 
     describe('get', () => {
       it('returns null', async () => {
-        expect(await kv.get('key')).toEqual(null)
+        expect(await metadata(context).get('key')).toEqual(null)
+      })
+
+      it('returns null without key', async () => {
+        expect(await metadata(context).get()).toEqual(null)
       })
     })
   })
@@ -48,94 +74,116 @@ describe('metadata', () => {
   describe('on issue with existing metadata', () => {
     beforeEach(() => {
       github.issues.get.andReturn(Promise.resolve({
-        data: {body: 'original post\n\n<!-- probot = {"prefix":{"key":"value"}} -->'}
+        data: {body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'}
       }))
     })
 
     describe('set', () => {
       it('sets new metadata', async () => {
-        await kv.set('hello', 'world')
+        await metadata(context).set('hello', 'world')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"prefix":{"key":"value","hello":"world"}} -->'
+          body: 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->'
         })
       })
 
       it('overwrites exiting metadata', async () => {
-        await kv.set('key', 'new value')
+        await metadata(context).set('key', 'new value')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"prefix":{"key":"new value"}} -->'
+          body: 'original post\n\n<!-- probot = {"1":{"key":"new value"}} -->'
+        })
+      })
+
+      it('merges object with existing metadata', async () => {
+        await metadata(context).set({hello: 'world'})
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->'
         })
       })
     })
 
     describe('get', () => {
       it('returns value', async () => {
-        expect(await kv.get('key')).toEqual('value')
+        expect(await metadata(context).get('key')).toEqual('value')
       })
 
       it('returns null for unknown key', async () => {
-        expect(await kv.get('unknown')).toEqual(null)
+        expect(await metadata(context).get('unknown')).toEqual(null)
       })
     })
   })
 
-  describe('on issue with metadata for a different prefix', () => {
+  describe('on issue with metadata for a different installation', () => {
     beforeEach(() => {
       github.issues.get.andReturn(Promise.resolve({
-        data: {body: 'original post\n\n<!-- probot = {"otherprefix":{"key":"value"}} -->'}
+        data: {body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'}
       }))
     })
 
     describe('set', () => {
       it('sets new metadata', async () => {
-        await kv.set('hello', 'world')
+        await metadata(context).set('hello', 'world')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"otherprefix":{"key":"value"},"prefix":{"hello":"world"}} -->'
+          body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
+        })
+      })
+
+      it('sets an object', async () => {
+        await metadata(context).set({hello: 'world'})
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
         })
       })
     })
 
     describe('get', () => {
       it('returns null for unknown key', async () => {
-        expect(await kv.get('unknown')).toEqual(null)
+        expect(await metadata(context).get('unknown')).toEqual(null)
+      })
+
+      it('returns null without a key', async() => {
+        expect(await metadata(context).get()).toEqual(null)
       })
     })
   })
 
   describe('when given body in issue params', () => {
-    beforeEach(() => {
-      const issue = {
-        owner: 'foo',
-        repo: 'bar',
-        number: 42,
-        body: 'hello world\n\n<!-- probot = {"prefix":{"hello":"world"}} -->'
-      }
-
-      kv = metadata(github, issue, 'prefix')
-    })
+    const issue = {
+      owner: 'foo',
+      repo: 'bar',
+      number: 42,
+      body: 'hello world\n\n<!-- probot = {"1":{"hello":"world"}} -->'
+    }
 
     describe('get', () => {
       it('returns the value without an API call', async () => {
-        expect(await kv.get('hello')).toEqual('world')
+        expect(await metadata(context, issue).get('hello')).toEqual('world')
         expect(github.issues.get).toNotHaveBeenCalled()
       })
     })
 
     describe('set', () => {
       it('updates the value without an API call', async () => {
-        await kv.set('foo', 'bar')
+        await metadata(context, issue).set('foo', 'bar')
 
         expect(github.issues.get).toNotHaveBeenCalled()
 
@@ -143,7 +191,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'hello world\n\n<!-- probot = {"prefix":{"hello":"world","foo":"bar"}} -->'
+          body: 'hello world\n\n<!-- probot = {"1":{"hello":"world","foo":"bar"}} -->'
         })
       })
     })
