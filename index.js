@@ -1,6 +1,11 @@
 const regex = /\n\n<!-- probot = (.*) -->/
 
-module.exports = (github, issue, prefix) => {
+module.exports = (context, issue = null) => {
+  const github = context.github
+  const prefix = context.payload.installation.id
+
+  if (!issue) issue = context.issue()
+
   return {
     async get (key) {
       let body = issue.body

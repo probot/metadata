@@ -8,10 +8,9 @@ A [Probot](https://github.com/probot/probot) extension to store metadata on Issu
 const metadata = require('probot-metadata');
 
 // where `context` is a Probot `Context`
-const kv = metadata(context.github, context.issue(), process.env.APP_ID)
+await metadata(context).set(key, value)
 
-await kv.set(key, value)
-const value = await kv.get(key)
+const value = await metadata(context).get(key)
 ```
 
 ## Example
@@ -21,11 +20,9 @@ const metadata = require('probot-metadata');
 
 module.exports = robot => {
   robot.on('issue_comment.created', async context => {
-    const kv = metadata(context.github, context.issue(), process.env.APP_ID)
-
     match = context.payload.comment.body.match('/snooze (.*)')
     if(match) {
-      kv.set(context, 'snooze', match[1]);
+      metadata(context).set('snooze', match[1])
     }
   })
 }
