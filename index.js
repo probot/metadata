@@ -7,7 +7,7 @@ module.exports = (context, issue = null) => {
   if (!issue) issue = context.issue()
 
   return {
-    async get (key) {
+    async get (key = null) {
       let body = issue.body
 
       if (!body) {
@@ -17,8 +17,8 @@ module.exports = (context, issue = null) => {
       const match = body.match(regex)
 
       if (match) {
-        const data = JSON.parse(match[1])
-        return data[prefix] && data[prefix][key]
+        const data = JSON.parse(match[1])[prefix]
+        return key ? data && data[key] : data
       }
     },
 
@@ -33,8 +33,14 @@ module.exports = (context, issue = null) => {
         return ''
       })
 
-      data[prefix] = data[prefix] || {}
-      data[prefix][key] = value
+      if (!data[prefix]) data[prefix] = {}
+
+      if (typeof key === 'object') {
+        Object.assign(data[prefix], key)
+      } else {
+        data[prefix][key] = value
+      }
+
       body = `${body}\n\n<!-- probot = ${JSON.stringify(data)} -->`
 
       const {owner, repo, number} = issue

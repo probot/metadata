@@ -37,8 +37,19 @@ describe('metadata', () => {
     })
 
     describe('set', () => {
-      it('sets metadata', async () => {
+      it('sets a key', async () => {
         await metadata(context).set('key', 'value')
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
+        })
+      })
+
+      it('sets an object', async () => {
+        await metadata(context).set({key: 'value'})
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
@@ -52,6 +63,10 @@ describe('metadata', () => {
     describe('get', () => {
       it('returns null', async () => {
         expect(await metadata(context).get('key')).toEqual(null)
+      })
+
+      it('returns null without key', async () => {
+        expect(await metadata(context).get()).toEqual(null)
       })
     })
   })
@@ -85,6 +100,17 @@ describe('metadata', () => {
           body: 'original post\n\n<!-- probot = {"1":{"key":"new value"}} -->'
         })
       })
+
+      it('merges object with existing metadata', async () => {
+        await metadata(context).set({hello: 'world'})
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->'
+        })
+      })
     })
 
     describe('get', () => {
@@ -116,11 +142,26 @@ describe('metadata', () => {
           body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
         })
       })
+
+      it('sets an object', async () => {
+        await metadata(context).set({hello: 'world'})
+
+        expect(github.issues.edit).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
+        })
+      })
     })
 
     describe('get', () => {
       it('returns null for unknown key', async () => {
         expect(await metadata(context).get('unknown')).toEqual(null)
+      })
+
+      it('returns null without a key', async() => {
+        expect(await metadata(context).get()).toEqual(null)
       })
     })
   })
