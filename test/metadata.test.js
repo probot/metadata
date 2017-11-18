@@ -1,4 +1,3 @@
-const expect = require('expect')
 const metadata = require('..')
 const Context = require('probot/lib/context')
 
@@ -8,8 +7,8 @@ describe('metadata', () => {
   beforeEach(() => {
     github = {
       issues: {
-        edit: expect.createSpy(),
-        get: expect.createSpy().andReturn(Promise.resolve({
+        edit: jest.fn(),
+        get: jest.fn().mockImplementation(() => Promise.resolve({
           data: {body: 'original post'}
         }))
       }
@@ -31,7 +30,7 @@ describe('metadata', () => {
 
   describe('on issue without metdata', () => {
     beforeEach(() => {
-      github.issues.get.andReturn(Promise.resolve({
+      github.issues.get.mockReturnValueOnce(Promise.resolve({
         data: {body: 'original post'}
       }))
     })
@@ -73,7 +72,7 @@ describe('metadata', () => {
 
   describe('on issue with existing metadata', () => {
     beforeEach(() => {
-      github.issues.get.andReturn(Promise.resolve({
+      github.issues.get.mockReturnValueOnce(Promise.resolve({
         data: {body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'}
       }))
     })
@@ -126,7 +125,7 @@ describe('metadata', () => {
 
   describe('on issue with metadata for a different installation', () => {
     beforeEach(() => {
-      github.issues.get.andReturn(Promise.resolve({
+      github.issues.get.mockReturnValueOnce(Promise.resolve({
         data: {body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'}
       }))
     })
@@ -177,7 +176,7 @@ describe('metadata', () => {
     describe('get', () => {
       it('returns the value without an API call', async () => {
         expect(await metadata(context, issue).get('hello')).toEqual('world')
-        expect(github.issues.get).toNotHaveBeenCalled()
+        expect(github.issues.get).not.toHaveBeenCalled()
       })
     })
 
@@ -185,7 +184,7 @@ describe('metadata', () => {
       it('updates the value without an API call', async () => {
         await metadata(context, issue).set('foo', 'bar')
 
-        expect(github.issues.get).toNotHaveBeenCalled()
+        expect(github.issues.get).not.toHaveBeenCalled()
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
