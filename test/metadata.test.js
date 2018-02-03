@@ -8,7 +8,7 @@ describe('metadata', () => {
     github = {
       issues: {
         edit: jest.fn(),
-        get: jest.fn(() => Promise.resolve({
+        get: jest.fn().mockImplementation(() => Promise.resolve({
           data: {body: 'original post'}
         }))
       }
