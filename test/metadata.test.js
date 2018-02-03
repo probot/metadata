@@ -1,4 +1,3 @@
-const expect = require('expect')
 const metadata = require('..')
 const Context = require('probot/lib/context')
 
@@ -8,8 +7,8 @@ describe('metadata', () => {
   beforeEach(() => {
     github = {
       issues: {
-        edit: expect.createSpy(),
-        get: expect.createSpy().andReturn(Promise.resolve({
+        edit: jest.fn(),
+        get: jest.fn(() => Promise.resolve({
           data: {body: 'original post'}
         }))
       }
@@ -31,13 +30,13 @@ describe('metadata', () => {
 
   describe('on issue without metdata', () => {
     beforeEach(() => {
-      github.issues.get.andReturn(Promise.resolve({
+      github.issues.get.mockImplementation(() => Promise.resolve({
         data: {body: 'original post'}
       }))
     })
 
     describe('set', () => {
-      it('sets a key', async () => {
+      test('sets a key', async () => {
         await metadata(context).set('key', 'value')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
@@ -48,7 +47,7 @@ describe('metadata', () => {
         })
       })
 
-      it('sets an object', async () => {
+      test('sets an object', async () => {
         await metadata(context).set({key: 'value'})
 
         expect(github.issues.edit).toHaveBeenCalledWith({
@@ -61,25 +60,25 @@ describe('metadata', () => {
     })
 
     describe('get', () => {
-      it('returns null', async () => {
-        expect(await metadata(context).get('key')).toEqual(null)
+      test('returns undefined', async () => {
+        expect(await metadata(context).get('key')).toEqual(undefined)
       })
 
-      it('returns null without key', async () => {
-        expect(await metadata(context).get()).toEqual(null)
+      test('returns undefined without key', async () => {
+        expect(await metadata(context).get()).toEqual(undefined)
       })
     })
   })
 
   describe('on issue with existing metadata', () => {
     beforeEach(() => {
-      github.issues.get.andReturn(Promise.resolve({
+      github.issues.get.mockImplementation(() => Promise.resolve({
         data: {body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'}
       }))
     })
 
     describe('set', () => {
-      it('sets new metadata', async () => {
+      test('sets new metadata', async () => {
         await metadata(context).set('hello', 'world')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
@@ -90,7 +89,7 @@ describe('metadata', () => {
         })
       })
 
-      it('overwrites exiting metadata', async () => {
+      test('overwrites exiting metadata', async () => {
         await metadata(context).set('key', 'new value')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
@@ -101,7 +100,7 @@ describe('metadata', () => {
         })
       })
 
-      it('merges object with existing metadata', async () => {
+      test('merges object with existing metadata', async () => {
         await metadata(context).set({hello: 'world'})
 
         expect(github.issues.edit).toHaveBeenCalledWith({
@@ -114,25 +113,25 @@ describe('metadata', () => {
     })
 
     describe('get', () => {
-      it('returns value', async () => {
+      test('returns value', async () => {
         expect(await metadata(context).get('key')).toEqual('value')
       })
 
-      it('returns null for unknown key', async () => {
-        expect(await metadata(context).get('unknown')).toEqual(null)
+      test('returns undefined for unknown key', async () => {
+        expect(await metadata(context).get('unknown')).toEqual(undefined)
       })
     })
   })
 
   describe('on issue with metadata for a different installation', () => {
     beforeEach(() => {
-      github.issues.get.andReturn(Promise.resolve({
+      github.issues.get.mockImplementation(() => Promise.resolve({
         data: {body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'}
       }))
     })
 
     describe('set', () => {
-      it('sets new metadata', async () => {
+      test('sets new metadata', async () => {
         await metadata(context).set('hello', 'world')
 
         expect(github.issues.edit).toHaveBeenCalledWith({
@@ -143,7 +142,7 @@ describe('metadata', () => {
         })
       })
 
-      it('sets an object', async () => {
+      test('sets an object', async () => {
         await metadata(context).set({hello: 'world'})
 
         expect(github.issues.edit).toHaveBeenCalledWith({
@@ -156,12 +155,12 @@ describe('metadata', () => {
     })
 
     describe('get', () => {
-      it('returns null for unknown key', async () => {
-        expect(await metadata(context).get('unknown')).toEqual(null)
+      test('returns undefined for unknown key', async () => {
+        expect(await metadata(context).get('unknown')).toEqual(undefined)
       })
 
-      it('returns null without a key', async() => {
-        expect(await metadata(context).get()).toEqual(null)
+      test('returns undefined without a key', async() => {
+        expect(await metadata(context).get()).toEqual(undefined)
       })
     })
   })
@@ -175,17 +174,17 @@ describe('metadata', () => {
     }
 
     describe('get', () => {
-      it('returns the value without an API call', async () => {
+      test('returns the value without an API call', async () => {
         expect(await metadata(context, issue).get('hello')).toEqual('world')
-        expect(github.issues.get).toNotHaveBeenCalled()
+        expect(github.issues.get).not.toHaveBeenCalled()
       })
     })
 
     describe('set', () => {
-      it('updates the value without an API call', async () => {
+      test('updates the value without an API call', async () => {
         await metadata(context, issue).set('foo', 'bar')
 
-        expect(github.issues.get).toNotHaveBeenCalled()
+        expect(github.issues.get).not.toHaveBeenCalled()
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',

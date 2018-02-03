@@ -4,7 +4,7 @@
   "description": "A Probot extension to store metadata on Issues and Pull Requests",
   "main": "index.js",
   "scripts": {
-    "test": "mocha && standard"
+    "test": "jest && standard"
   },
   "repository": {
     "type": "git",
@@ -20,12 +20,11 @@
   },
   "homepage": "https://github.com/probot/metadata#readme",
   "devDependencies": {
-    "expect": "^1.20.2",
-    "mocha": "^3.5.0",
+    "jest": "^22.1.4",
     "probot": "^0.11.0",
     "standard": "^10.0.3"
   },
   "standard": {
-    "env": "mocha"
+    "env": "jest"
   }
 }
