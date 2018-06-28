@@ -1,5 +1,11 @@
-const metadata = require('..')
+const fs = require('fs')
 const Context = require('probot/lib/context')
+const jwt = require('jsonwebtoken')
+const metadata = require('..')
+
+const cert = fs.readFileSync(process.env.PRIVATE_KEY_PATH)
+const jwtOptions = { algorithm: 'HS256', noTimestamp: true }
+const sign = (data) => jwt.sign(data, cert, jwtOptions)
 
 describe('metadata', () => {
   let context, event, github
@@ -43,7 +49,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
+          body: `original post\n\n<!-- probot = ${sign({"1":{"key":"value"}})} -->`
         })
       })
 
@@ -54,7 +60,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
+          body: `original post\n\n<!-- probot = ${sign({"1":{"key":"value"}})} -->`
         })
       })
     })
@@ -73,7 +79,7 @@ describe('metadata', () => {
   describe('on issue with existing metadata', () => {
     beforeEach(() => {
       github.issues.get.mockImplementation(() => Promise.resolve({
-        data: {body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'}
+        data: {body: `original post\n\n<!-- probot = ${sign({"1":{"key":"value"}})} -->`}
       }))
     })
 
@@ -85,7 +91,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->'
+          body: `original post\n\n<!-- probot = ${sign({"1":{"key":"value","hello":"world"}})} -->`
         })
       })
 
@@ -96,7 +102,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"1":{"key":"new value"}} -->'
+          body: `original post\n\n<!-- probot = ${sign({"1":{"key":"new value"}})} -->`
         })
       })
 
@@ -107,7 +113,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->'
+          body: `original post\n\n<!-- probot = ${sign({"1":{"key":"value","hello":"world"}})} -->`
         })
       })
     })
@@ -126,7 +132,7 @@ describe('metadata', () => {
   describe('on issue with metadata for a different installation', () => {
     beforeEach(() => {
       github.issues.get.mockImplementation(() => Promise.resolve({
-        data: {body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'}
+        data: {body: `original post\n\n<!-- probot = ${sign({"2":{"key":"value"}})} -->`}
       }))
     })
 
@@ -138,7 +144,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
+          body: `original post\n\n<!-- probot = ${sign({"1":{"hello":"world"},"2":{"key":"value"}})} -->`
         })
       })
 
@@ -149,7 +155,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
+          body: `original post\n\n<!-- probot = ${sign({"1":{"hello":"world"},"2":{"key":"value"}})} -->`
         })
       })
     })
@@ -170,7 +176,7 @@ describe('metadata', () => {
       owner: 'foo',
       repo: 'bar',
       number: 42,
-      body: 'hello world\n\n<!-- probot = {"1":{"hello":"world"}} -->'
+      body: `hello world\n\n<!-- probot = ${sign({"1":{"hello":"world"}})} -->`
     }
 
     describe('get', () => {
@@ -190,7 +196,7 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: 'hello world\n\n<!-- probot = {"1":{"hello":"world","foo":"bar"}} -->'
+          body: `hello world\n\n<!-- probot = ${sign({"1":{"hello":"world","foo":"bar"}})} -->`
         })
       })
     })
