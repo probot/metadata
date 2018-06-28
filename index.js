@@ -2,7 +2,8 @@ const regex = /\n\n<!-- probot = (.*) -->/
 
 module.exports = (context, issue = null) => {
   const github = context.github
-  const prefix = context.payload.installation.id
+  let prefix = process.env.APP_ID
+  const oldPrefix = context.payload.installation.id
 
   if (!issue) issue = context.issue()
 
@@ -17,7 +18,8 @@ module.exports = (context, issue = null) => {
       const match = body.match(regex)
 
       if (match) {
-        const data = JSON.parse(match[1])[prefix]
+        const json = JSON.parse(match[1])
+        const data = json[prefix] || json[oldPrefix]
         return key ? data && data[key] : data
       }
     },
@@ -33,6 +35,9 @@ module.exports = (context, issue = null) => {
         return ''
       })
 
+      if (!prefix) {
+        prefix = oldPrefix
+      }
       if (!data[prefix]) data[prefix] = {}
 
       if (typeof key === 'object') {
