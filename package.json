@@ -29,6 +29,7 @@
     "env": "jest"
   },
   "dependencies": {
-    "jsonwebtoken": "^8.3.0"
+    "node-jose": "^1.0.0",
+    "rsa-pem-to-jwk": "^1.1.3"
   }
 }

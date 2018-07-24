@@ -1,11 +1,17 @@
-const fs = require('fs')
 const Context = require('probot/lib/context')
-const jwt = require('jsonwebtoken')
 const metadata = require('..')
+const crypto = require('../crypto')()
+const { regex } = metadata
 
-const cert = fs.readFileSync(process.env.PRIVATE_KEY_PATH)
-const jwtOptions = { algorithm: 'HS256', noTimestamp: true }
-const sign = (data) => jwt.sign(data, cert, jwtOptions)
+const parseEditedIssueBody = async github => {
+  const body = github.issues.edit.mock.calls[0][0].body
+  const match = body.match(regex)
+  return {
+    prefix: body.substring(0, match.index),
+    data: await crypto.decrypt(match[1]),
+    suffix: body.substring(match.index + match[0].length)
+  }
+}
 
 describe('metadata', () => {
   let context, event, github
@@ -14,20 +20,22 @@ describe('metadata', () => {
     github = {
       issues: {
         edit: jest.fn(),
-        get: jest.fn().mockImplementation(() => Promise.resolve({
-          data: {body: 'original post'}
-        }))
+        get: jest.fn().mockImplementation(() =>
+          Promise.resolve({
+            data: { body: 'original post' }
+          })
+        )
       }
     }
 
     event = {
       payload: {
-        issue: {number: 42},
+        issue: { number: 42 },
         repository: {
-          owner: {login: 'foo'},
+          owner: { login: 'foo' },
           name: 'bar'
         },
-        installation: {id: 1}
+        installation: { id: 1 }
       }
     }
 
@@ -36,9 +44,11 @@ describe('metadata', () => {
 
   describe('on issue without metdata', () => {
     beforeEach(() => {
-      github.issues.get.mockImplementation(() => Promise.resolve({
-        data: {body: 'original post'}
-      }))
+      github.issues.get.mockImplementation(() =>
+        Promise.resolve({
+          data: { body: 'original post' }
+        })
+      )
     })
 
     describe('set', () => {
@@ -49,18 +59,28 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `original post\n\n<!-- probot = ${sign({'1': {'key': 'value'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { key: 'value' } },
+          prefix: 'original post',
+          suffix: ''
         })
       })
 
       test('sets an object', async () => {
-        await metadata(context).set({key: 'value'})
+        await metadata(context).set({ key: 'value' })
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `original post\n\n<!-- probot = ${sign({'1': {'key': 'value'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { key: 'value' } },
+          prefix: 'original post',
+          suffix: ''
         })
       })
     })
@@ -78,9 +98,15 @@ describe('metadata', () => {
 
   describe('on issue with existing metadata', () => {
     beforeEach(() => {
-      github.issues.get.mockImplementation(() => Promise.resolve({
-        data: {body: `original post\n\n<!-- probot = ${sign({'1': {'key': 'value'}})} -->`}
-      }))
+      github.issues.get.mockImplementation(async () => {
+        return {
+          data: {
+            body: `original post\n\n<!-- probot = ${await crypto.encrypt({
+              '1': { key: 'value' }
+            })} -->`
+          }
+        }
+      })
     })
 
     describe('set', () => {
@@ -91,7 +117,12 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `original post\n\n<!-- probot = ${sign({'1': {'key': 'value', 'hello': 'world'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { hello: 'world', key: 'value' } },
+          prefix: 'original post',
+          suffix: ''
         })
       })
 
@@ -102,18 +133,28 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `original post\n\n<!-- probot = ${sign({'1': {'key': 'new value'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { key: 'new value' } },
+          prefix: 'original post',
+          suffix: ''
         })
       })
 
       test('merges object with existing metadata', async () => {
-        await metadata(context).set({hello: 'world'})
+        await metadata(context).set({ hello: 'world' })
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `original post\n\n<!-- probot = ${sign({'1': {'key': 'value', 'hello': 'world'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { hello: 'world', key: 'value' } },
+          prefix: 'original post',
+          suffix: ''
         })
       })
     })
@@ -131,9 +172,15 @@ describe('metadata', () => {
 
   describe('on issue with metadata for a different installation', () => {
     beforeEach(() => {
-      github.issues.get.mockImplementation(() => Promise.resolve({
-        data: {body: `original post\n\n<!-- probot = ${sign({'2': {'key': 'value'}})} -->`}
-      }))
+      github.issues.get.mockImplementation(async () => {
+        return {
+          data: {
+            body: `original post\n\n<!-- probot = ${await crypto.encrypt({
+              '2': { key: 'value' }
+            })} -->`
+          }
+        }
+      })
     })
 
     describe('set', () => {
@@ -144,18 +191,28 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `original post\n\n<!-- probot = ${sign({'1': {'hello': 'world'}, '2': {'key': 'value'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { hello: 'world' }, '2': { key: 'value' } },
+          prefix: 'original post',
+          suffix: ''
         })
       })
 
       test('sets an object', async () => {
-        await metadata(context).set({hello: 'world'})
+        await metadata(context).set({ hello: 'world' })
 
         expect(github.issues.edit).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `original post\n\n<!-- probot = ${sign({'1': {'hello': 'world'}, '2': {'key': 'value'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { hello: 'world' }, '2': { key: 'value' } },
+          prefix: 'original post',
+          suffix: ''
         })
       })
     })
@@ -165,19 +222,25 @@ describe('metadata', () => {
         expect(await metadata(context).get('unknown')).toEqual(undefined)
       })
 
-      test('returns undefined without a key', async() => {
+      test('returns undefined without a key', async () => {
         expect(await metadata(context).get()).toEqual(undefined)
       })
     })
   })
 
   describe('when given body in issue params', () => {
-    const issue = {
-      owner: 'foo',
-      repo: 'bar',
-      number: 42,
-      body: `hello world\n\n<!-- probot = ${sign({'1': {'hello': 'world'}})} -->`
-    }
+    let issue
+
+    beforeEach(async () => {
+      issue = {
+        owner: 'foo',
+        repo: 'bar',
+        number: 42,
+        body: `hello world\n\n<!-- probot = ${await crypto.encrypt({
+          '1': { hello: 'world' }
+        })} -->`
+      }
+    })
 
     describe('get', () => {
       test('returns the value without an API call', async () => {
@@ -196,7 +259,12 @@ describe('metadata', () => {
           owner: 'foo',
           repo: 'bar',
           number: 42,
-          body: `hello world\n\n<!-- probot = ${sign({'1': {'hello': 'world', 'foo': 'bar'}})} -->`
+          body: expect.any(String)
+        })
+        expect(await parseEditedIssueBody(github)).toEqual({
+          data: { '1': { foo: 'bar', hello: 'world' } },
+          prefix: 'hello world',
+          suffix: ''
         })
       })
     })
