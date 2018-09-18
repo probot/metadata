@@ -20,11 +20,14 @@
   },
   "homepage": "https://github.com/probot/metadata#readme",
   "devDependencies": {
-    "jest": "^22.1.4",
+    "jest": "^23.6.0",
     "probot": "^0.11.0",
     "standard": "^10.0.3"
   },
   "standard": {
     "env": "jest"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
