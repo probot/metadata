@@ -7,7 +7,7 @@ describe('metadata', () => {
   beforeEach(() => {
     github = {
       issues: {
-        edit: jest.fn(),
+        update: jest.fn(),
         get: jest.fn().mockImplementation(() => Promise.resolve({
           data: {body: 'original post'}
         }))
@@ -39,7 +39,7 @@ describe('metadata', () => {
       test('sets a key', async () => {
         await metadata(context).set('key', 'value')
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
@@ -50,7 +50,7 @@ describe('metadata', () => {
       test('sets an object', async () => {
         await metadata(context).set({key: 'value'})
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
@@ -81,7 +81,7 @@ describe('metadata', () => {
       test('sets new metadata', async () => {
         await metadata(context).set('hello', 'world')
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
@@ -92,7 +92,7 @@ describe('metadata', () => {
       test('overwrites exiting metadata', async () => {
         await metadata(context).set('key', 'new value')
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
@@ -103,7 +103,7 @@ describe('metadata', () => {
       test('merges object with existing metadata', async () => {
         await metadata(context).set({hello: 'world'})
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
@@ -134,7 +134,7 @@ describe('metadata', () => {
       test('sets new metadata', async () => {
         await metadata(context).set('hello', 'world')
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
@@ -145,7 +145,7 @@ describe('metadata', () => {
       test('sets an object', async () => {
         await metadata(context).set({hello: 'world'})
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,
@@ -186,7 +186,7 @@ describe('metadata', () => {
 
         expect(github.issues.get).not.toHaveBeenCalled()
 
-        expect(github.issues.edit).toHaveBeenCalledWith({
+        expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
           number: 42,

@@ -44,7 +44,7 @@ module.exports = (context, issue = null) => {
       body = `${body}\n\n<!-- probot = ${JSON.stringify(data)} -->`
 
       const {owner, repo, number} = issue
-      return github.issues.edit({owner, repo, number, body})
+      return github.issues.update({owner, repo, number, body})
     }
   }
 }
