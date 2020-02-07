@@ -1,6 +1,6 @@
 {
   "name": "probot-metadata",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Probot extension to store metadata on Issues and Pull Requests",
   "main": "index.js",
   "scripts": {
