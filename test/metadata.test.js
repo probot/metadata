@@ -165,6 +165,48 @@ describe('metadata', () => {
     })
   })
 
+  describe('on an issue with no content in the body', () => {
+    beforeEach(() => {
+      github.issues.get.mockImplementation(() => Promise.resolve({
+        data: {body: null}
+      }))
+    })
+
+    describe('set', () => {
+      test('sets new metadata', async () => {
+        await metadata(context).set('hello', 'world')
+
+        expect(github.issues.update).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: '\n\n<!-- probot = {"1":{"hello":"world"}} -->'
+        })
+      })
+
+      test('sets an object', async () => {
+        await metadata(context).set({hello: 'world'})
+
+        expect(github.issues.update).toHaveBeenCalledWith({
+          owner: 'foo',
+          repo: 'bar',
+          number: 42,
+          body: '\n\n<!-- probot = {"1":{"hello":"world"}} -->'
+        })
+      })
+    })
+
+    describe('get', () => {
+      test('returns undefined for unknown key', async () => {
+        expect(await metadata(context).get('unknown')).toEqual(undefined)
+      })
+
+      test('returns undefined without a key', async() => {
+        expect(await metadata(context).get()).toEqual(undefined)
+      })
+    })
+  })
+
   describe('when given body in issue params', () => {
     const issue = {
       owner: 'foo',

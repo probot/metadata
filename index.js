@@ -11,7 +11,7 @@ module.exports = (context, issue = null) => {
       let body = issue.body
 
       if (!body) {
-        body = (await github.issues.get(issue)).data.body
+        body = (await github.issues.get(issue)).data.body || ''
       }
 
       const match = body.match(regex)
@@ -26,7 +26,7 @@ module.exports = (context, issue = null) => {
       let body = issue.body
       let data = {}
 
-      if (!body) body = (await github.issues.get(issue)).data.body
+      if (!body) body = (await github.issues.get(issue)).data.body || ''
 
       body = body.replace(regex, (_, json) => {
         data = JSON.parse(json)
