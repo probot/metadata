@@ -211,7 +211,7 @@ describe('metadata', () => {
     const issue = {
       owner: 'foo',
       repo: 'bar',
-      number: 42,
+      issue_number: 42,
       body: 'hello world\n\n<!-- probot = {"1":{"hello":"world"}} -->'
     }
 
