@@ -26,6 +26,9 @@
     "semantic-release": "^17.1.2",
     "standard": "^10.0.3"
   },
+  "peerDependencies": {
+    "probot": ">=10"
+  },
   "standard": {
     "env": "jest"
   },
