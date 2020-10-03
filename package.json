@@ -1,6 +1,6 @@
 {
   "name": "probot-metadata",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A Probot extension to store metadata on Issues and Pull Requests",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,13 @@
   "homepage": "https://github.com/probot/metadata#readme",
   "devDependencies": {
     "jest": "^23.6.0",
-    "probot": "^0.11.0",
+    "nock": "^13.0.4",
+    "probot": "^10.9.0",
+    "semantic-release": "^17.1.2",
     "standard": "^10.0.3"
+  },
+  "peerDependencies": {
+    "probot": ">=10"
   },
   "standard": {
     "env": "jest"
