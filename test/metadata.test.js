@@ -1,4 +1,4 @@
-const { Context } = require('probot');
+const { Context } = require('probot')
 const metadata = require('..')
 
 describe('metadata', () => {
