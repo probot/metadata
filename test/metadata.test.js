@@ -1,4 +1,4 @@
-import { Context } from 'probot';
+const { Context } = require('probot');
 const metadata = require('..')
 
 describe('metadata', () => {
