@@ -1,5 +1,5 @@
+import { Context } from 'probot';
 const metadata = require('..')
-const Context = require('probot/lib/context')
 
 describe('metadata', () => {
   let context, event, github
