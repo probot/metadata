@@ -42,7 +42,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
         })
       })
@@ -53,7 +53,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
         })
       })
@@ -84,7 +84,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->'
         })
       })
@@ -95,7 +95,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'original post\n\n<!-- probot = {"1":{"key":"new value"}} -->'
         })
       })
@@ -106,7 +106,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->'
         })
       })
@@ -137,7 +137,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
         })
       })
@@ -148,7 +148,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->'
         })
       })
@@ -179,7 +179,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: '\n\n<!-- probot = {"1":{"hello":"world"}} -->'
         })
       })
@@ -190,7 +190,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: '\n\n<!-- probot = {"1":{"hello":"world"}} -->'
         })
       })
@@ -231,7 +231,7 @@ describe('metadata', () => {
         expect(github.issues.update).toHaveBeenCalledWith({
           owner: 'foo',
           repo: 'bar',
-          number: 42,
+          issue_number: 42,
           body: 'hello world\n\n<!-- probot = {"1":{"hello":"world","foo":"bar"}} -->'
         })
       })
