@@ -1,7 +1,7 @@
 const regex = /\n\n<!-- probot = (.*) -->/
 
 module.exports = (context, issue = null) => {
-  const github = context.github
+  const github = context.octokit || context.github
   const prefix = context.payload.installation.id
 
   if (!issue) issue = context.issue()
@@ -43,8 +43,8 @@ module.exports = (context, issue = null) => {
 
       body = `${body}\n\n<!-- probot = ${JSON.stringify(data)} -->`
 
-      const {owner, repo, issue_number} = issue
-      return github.issues.update({owner, repo, issue_number, body})
+      const { owner, repo, issue_number } = issue
+      return github.issues.update({ owner, repo, issue_number, body })
     }
   }
 }
