@@ -6,19 +6,12 @@
   "scripts": {
     "test": "jest && standard"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/probot/metadata.git"
-  },
+  "repository": "github:probot/metadata",
   "keywords": [
     "probot"
   ],
   "author": "Brandon Keepers",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/probot/metadata/issues"
-  },
-  "homepage": "https://github.com/probot/metadata#readme",
   "devDependencies": {
     "jest": "^23.6.0",
     "nock": "^13.0.4",
