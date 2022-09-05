@@ -27,5 +27,10 @@
   },
   "jest": {
     "testEnvironment": "node"
+  },
+  "renovate": {
+    "extends": [
+      "github>octokit/.github"
+    ]
   }
 }
