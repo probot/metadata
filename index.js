@@ -1,4 +1,4 @@
-const regex = /\n\n<!-- probot = (.*) -->/
+const regex = /<!-- probot = (.*) -->/
 
 module.exports = (context, issue = null) => {
   const github = context.octokit || context.github
