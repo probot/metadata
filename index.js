@@ -1,4 +1,4 @@
-const regex = /\n\n<!-- probot = (.*) -->/
+const regex = /(\n\n|\r\n)<!-- probot = (.*) -->/
 
 module.exports = (context, issue = null) => {
   const github = context.octokit || context.github
@@ -17,7 +17,7 @@ module.exports = (context, issue = null) => {
       const match = body.match(regex)
 
       if (match) {
-        const data = JSON.parse(match[1])[prefix]
+        const data = JSON.parse(match[2])[prefix]
         return key ? data && data[key] : data
       }
     },
@@ -28,10 +28,13 @@ module.exports = (context, issue = null) => {
 
       if (!body) body = (await github.issues.get(issue)).data.body || ''
 
-      body = body.replace(regex, (_, json) => {
-        data = JSON.parse(json)
-        return ''
-      })
+      const match = body.match(regex)
+
+      if (match) {
+        data = JSON.parse(match[2])
+      }
+
+      body = body.replace(regex, '')
 
       if (!data[prefix]) data[prefix] = {}
 
