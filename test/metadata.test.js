@@ -318,4 +318,4 @@ describe('metadata', () => {
       })
     })
   })
-})
+})'invert mock.u'
