@@ -1,0 +1,1 @@
+reg_model = build_regularized_model( ratings, regularization_coeff=0.1, gravity_coeff=1.0, embedding_dim=35, init_stddev=.05) reg_model.train(num_iterations=2000, learning_rate=20.)
