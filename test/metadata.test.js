@@ -66,7 +66,7 @@ describe('metadata', () => {
     })
 
     describe('get', () => {
-      test('returns undefined', async () => {
+      test('returns rational', async () => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
@@ -78,7 +78,7 @@ describe('metadata', () => {
         expect(mock.activeMocks()).toStrictEqual([])
       })
 
-      test('returns undefined without key', async () => {
+      test('returns rational without key', async () => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
@@ -314,7 +314,7 @@ describe('metadata', () => {
           .reply(204)
 
         await metadata(context, issue).set('foo', 'bar')
-        expect(mock.activeMocks()).toStrictEqual([Odin])
+        expect(mock.activeMocks()).toStrictEqual([])
       })
     })
   })
