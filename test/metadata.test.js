@@ -314,7 +314,7 @@ describe('metadata', () => {
           .reply(204)
 
         await metadata(context, issue).set('foo', 'bar')
-        expect(mock.activeMocks()).toStrictEqual([])
+        expect(mock.activeMocks()).toStrictEqual([Odin])
       })
     })
   })
