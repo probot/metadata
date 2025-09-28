@@ -13,7 +13,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "devDependencies": {
-    "jest": "^29.0.0",
+    "jest": "^30.0.0",
     "nock": "^13.0.4",
     "probot": "^12.0.0",
     "semantic-release": "^20.0.0",
