@@ -28,7 +28,7 @@ const metadata = /** @type {ProbotMetadataConstructor} */ (context, issue) => {
     async set (key, value) {
       let body = issue.body
       /** @type {Record<number, Record<number|string, any>>} */
-      let data = {}
+      let data = Object.create(null)
 
       if (!body) body = (await octokit.rest.issues.get(issue)).data.body || ''
 
@@ -40,8 +40,11 @@ const metadata = /** @type {ProbotMetadataConstructor} */ (context, issue) => {
 
       body = body.replace(probotMetadataRegex, '')
 
-      if (!data[prefix]) data[prefix] = {}
+      if (!data[prefix]) data[prefix] = Object.create(null)
 
+      if (["__proto__", "constructor", "prototype"].includes(prefix)) {
+        throw new Error("Invalid prefix value for metadata (possible prototype pollution)");
+      }
       if (typeof key === 'string' || typeof key === 'number') {
         data[prefix][key] = value
       } else {
