@@ -1,4 +1,5 @@
 const probotMetadataRegex = /(?:\n\n|\r\n)<!-- probot = (.*) -->/
+const prototypePollutionKeys = /** @type {const} */(['__proto__', 'constructor', 'prototype'])
 
 const metadata = /** @type {ProbotMetadataConstructor} */ (context, issue) => {
   const octokit = context.octokit
@@ -43,8 +44,8 @@ const metadata = /** @type {ProbotMetadataConstructor} */ (context, issue) => {
       if (!data[prefix]) data[prefix] = Object.create(null)
 
       // should never happen, but just in case
-      if (typeof prefix === 'string' && ["__proto__", "constructor", "prototype"].includes(prefix)) {
-        throw new TypeError("Invalid prefix value");
+      if (typeof prefix === 'string' && prototypePollutionKeys.includes(prefix)) {
+        throw new TypeError('Invalid prefix value')
       }
       if (typeof key === 'string' || typeof key === 'number') {
         data[prefix][key] = value
