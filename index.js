@@ -44,10 +44,12 @@ module.exports = (context, issue = null) => {
         data[prefix][key] = value
       }
 
-      body = `${body}\n\n<!-- probot = ${JSON.stringify(data)} -->`
-
-      const { owner, repo, issue_number } = issue
-      return github.issues.update({ owner, repo, issue_number, body })
+      return github.issues.update({
+        owner: issue.owner,
+        repo: issue.repo,
+        issue_number: issue.issue_number,
+        body: `${body}\n\n<!-- probot = ${JSON.stringify(data)} -->`
+      })
     }
   }
 }

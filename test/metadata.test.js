@@ -40,7 +40,7 @@ describe('metadata', () => {
             body: 'original post'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            t.assert.strictEqual(requestBody.body, `original post\n\n<!-- probot = {"1":{"key":"value"}} -->`)
+            t.assert.strictEqual(requestBody.body, 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->')
             return true
           })
           .reply(204)
@@ -56,7 +56,7 @@ describe('metadata', () => {
             body: 'original post'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            t.assert.strictEqual(requestBody.body, `original post\n\n<!-- probot = {"1":{"key":"value"}} -->`)
+            t.assert.strictEqual(requestBody.body, 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->')
             return true
           })
           .reply(204)

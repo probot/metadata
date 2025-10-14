@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node --test",
-    "lint": "standard",
-    "lint:fix": "standard --fix"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
   "repository": "github:probot/metadata",
   "keywords": [
@@ -15,14 +15,14 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^9.37.0",
+    "neostandard": "^0.12.2",
     "nock": "^13.0.4",
     "probot": "^12.0.0",
-    "semantic-release": "^20.0.0",
-    "standard": "^10.0.3"
+    "semantic-release": "^20.0.0"
   },
   "peerDependencies": {
     "probot": ">=10"
   },
-  "standard": {
-  }
+  "standard": {}
 }
