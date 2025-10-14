@@ -59,6 +59,8 @@ const metadata = /** @type {ProbotMetadataConstructor} */ (context, issue) => {
         issue_number: issue.issue_number,
         body: `${body}\n\n<!-- probot = ${JSON.stringify(data)} -->`
       })
+
+      issue.body = `${body}\n\n<!-- probot = ${JSON.stringify(data)} -->`
     }
   }
 }
