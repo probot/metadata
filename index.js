@@ -42,9 +42,6 @@ const metadata = /** @type {ProbotMetadataConstructor} */ (context, issue) => {
 
       if (!data[prefix]) data[prefix] = Object.create(null)
 
-      if (["__proto__", "constructor", "prototype"].includes(prefix)) {
-        throw new Error("Invalid prefix value for metadata (possible prototype pollution)");
-      }
       if (typeof key === 'string' || typeof key === 'number') {
         data[prefix][key] = value
       } else {
