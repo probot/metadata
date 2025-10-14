@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "outFile": "./index.d.ts",
+        "allowJs": true,
+        "checkJs": true,
+    }
+}
