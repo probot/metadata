@@ -1,15 +1,9 @@
 {
+    "extends": "./tsconfig.json",
     "compilerOptions": {
-        "skipLibCheck": true,
-        "declaration": true,
-        "noEmit": false,
-        "emitDeclarationOnly": true,
-        "strict": true,
-        "strictNullChecks": true,
-        "outFile": "./index.d.ts",
-        "allowJs": true,
-        "checkJs": true,
-        "esModuleInterop": true,
+        "noEmit": false
     },
-    "include": ["index.js"]
+    "include": [
+        "./index.js"
+    ]
 }
