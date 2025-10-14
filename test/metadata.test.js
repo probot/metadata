@@ -1,3 +1,5 @@
+const { describe, test, beforeEach } = require('node:test')
+
 const { Context, ProbotOctokit } = require('probot')
 const nock = require('nock')
 
@@ -31,261 +33,257 @@ describe('metadata', () => {
 
   describe('on issue without metdata', () => {
     describe('set', () => {
-      test('sets a key', async () => {
+      test('sets a key', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual(`original post\n\n<!-- probot = {"1":{"key":"value"}} -->`)
+            t.assert.strictEqual(requestBody.body, `original post\n\n<!-- probot = {"1":{"key":"value"}} -->`)
             return true
           })
           .reply(204)
 
         await metadata(context).set('key', 'value')
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('sets an object', async () => {
+      test('sets an object', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual(`original post\n\n<!-- probot = {"1":{"key":"value"}} -->`)
+            t.assert.strictEqual(requestBody.body, `original post\n\n<!-- probot = {"1":{"key":"value"}} -->`)
             return true
           })
           .reply(204)
 
         await metadata(context).set({ key: 'value' })
 
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
 
     describe('get', () => {
-      test('returns undefined', async () => {
+      test('returns undefined', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post'
           })
 
-        expect(await metadata(context).get('key')).toEqual(undefined)
-
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get('key'), undefined)
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('returns undefined without key', async () => {
+      test('returns undefined without key', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post'
           })
 
-        expect(await metadata(context).get()).toEqual(undefined)
-
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get(), undefined)
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
   })
 
   describe('on issue with existing metadata', () => {
     describe('set', () => {
-      test('sets new metadata', async () => {
+      test('sets new metadata', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->')
+            t.assert.strictEqual(requestBody.body, 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context).set('hello', 'world')
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('overwrites exiting metadata', async () => {
+      test('overwrites exiting metadata', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('original post\n\n<!-- probot = {"1":{"key":"new value"}} -->')
+            t.assert.strictEqual(requestBody.body, 'original post\n\n<!-- probot = {"1":{"key":"new value"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context).set('key', 'new value')
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('merges object with existing metadata', async () => {
+      test('merges object with existing metadata', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->')
+            t.assert.strictEqual(requestBody.body, 'original post\n\n<!-- probot = {"1":{"key":"value","hello":"world"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context).set({ hello: 'world' })
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
 
     describe('get', () => {
-      test('returns value', async () => {
+      test('returns value', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
           })
 
-        expect(await metadata(context).get('key')).toEqual('value')
-
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get('key'), 'value')
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('returns undefined for unknown key', async () => {
+      test('returns undefined for unknown key', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"1":{"key":"value"}} -->'
           })
 
-        expect(await metadata(context).get('unknown')).toEqual(undefined)
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get('unknown'), undefined)
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
   })
 
   describe('on issue with metadata for a different installation', () => {
     describe('set', () => {
-      test('sets new metadata', async () => {
+      test('sets new metadata', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->')
+            t.assert.strictEqual(requestBody.body, 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context).set('hello', 'world')
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('sets an object', async () => {
+      test('sets an object', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->')
+            t.assert.strictEqual(requestBody.body, 'original post\n\n<!-- probot = {"1":{"hello":"world"},"2":{"key":"value"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context).set({ hello: 'world' })
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
 
     describe('get', () => {
-      test('returns undefined for unknown key', async () => {
+      test('returns undefined for unknown key', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'
           })
 
-        expect(await metadata(context).get('unknown')).toEqual(undefined)
-
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get('unknown'), undefined)
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('returns undefined without a key', async () => {
+      test('returns undefined without a key', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: 'original post\n\n<!-- probot = {"2":{"key":"value"}} -->'
           })
 
-        expect(await metadata(context).get()).toEqual(undefined)
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get(), undefined)
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
   })
 
   describe('on an issue with no content in the body', () => {
     describe('set', () => {
-      test('sets new metadata', async () => {
+      test('sets new metadata', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: null
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('\n\n<!-- probot = {"1":{"hello":"world"}} -->')
+            t.assert.strictEqual(requestBody.body, '\n\n<!-- probot = {"1":{"hello":"world"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context).set('hello', 'world')
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('sets an object', async () => {
+      test('sets an object', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: null
           })
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('\n\n<!-- probot = {"1":{"hello":"world"}} -->')
+            t.assert.strictEqual(requestBody.body, '\n\n<!-- probot = {"1":{"hello":"world"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context).set({ hello: 'world' })
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
 
     describe('get', () => {
-      test('returns undefined for unknown key', async () => {
+      test('returns undefined for unknown key', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: null
           })
 
-        expect(await metadata(context).get('unknown')).toEqual(undefined)
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get('unknown'), undefined)
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
 
-      test('returns undefined without a key', async () => {
+      test('returns undefined without a key', async (t) => {
         const mock = nock('https://api.github.com')
           .get('/repos/foo/bar/issues/42')
           .reply(200, {
             body: null
           })
 
-        expect(await metadata(context).get()).toEqual(undefined)
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.strictEqual(await metadata(context).get(), undefined)
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
   })
@@ -299,22 +297,22 @@ describe('metadata', () => {
     }
 
     describe('get', () => {
-      test('returns the value without an API call', async () => {
-        expect(await metadata(context, issue).get('hello')).toEqual('world')
+      test('returns the value without an API call', async (t) => {
+        t.assert.strictEqual(await metadata(context, issue).get('hello'), 'world')
       })
     })
 
     describe('set', () => {
-      test('updates the value without an API call', async () => {
+      test('updates the value without an API call', async (t) => {
         const mock = nock('https://api.github.com')
           .patch('/repos/foo/bar/issues/42', (requestBody) => {
-            expect(requestBody.body).toEqual('hello world\n\n<!-- probot = {"1":{"hello":"world","foo":"bar"}} -->')
+            t.assert.strictEqual(requestBody.body, 'hello world\n\n<!-- probot = {"1":{"hello":"world","foo":"bar"}} -->')
             return true
           })
           .reply(204)
 
         await metadata(context, issue).set('foo', 'bar')
-        expect(mock.activeMocks()).toStrictEqual([])
+        t.assert.deepStrictEqual(mock.activeMocks(), [])
       })
     })
   })
