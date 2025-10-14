@@ -1,14 +1,13 @@
-const { describe, test, beforeEach } = require('node:test')
-
-const { Context, ProbotOctokit } = require('probot')
-const nock = require('nock')
+import { describe, test, beforeEach } from 'node:test'
+import { Context, ProbotOctokit } from 'probot'
+import nock from 'nock'
+import metadata from '../index.js'
 
 nock.disableNetConnect()
 
 /** @typedef {import('@octokit/webhooks').EmitterWebhookEvent<'issue_comment'>} IssueCommentEvent */
 /** @typedef {import('node:test').TestContext} TestContext */
 
-const metadata = require('../index.js')
 
 describe('metadata', () => {
   /** @type {import('probot').Context} */
@@ -34,7 +33,7 @@ describe('metadata', () => {
         throttle: { enabled: false },
         retry: { enabled: false }
       }),
-      console
+      /** @type {*} */ (console)
     )
   })
 

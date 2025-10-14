@@ -3,8 +3,10 @@
   "version": "1.1.0",
   "description": "A Probot extension to store metadata on Issues and Pull Requests",
   "main": "index.js",
+  "types": "index.d.ts",
+  "type": "module",
   "scripts": {
-    "build:types": "tsc --project tsconfig.json",
+    "build:types": "tsc --project tsconfig.types.json",
     "test": "node --test",
     "lint": "eslint",
     "lint:fix": "eslint --fix"

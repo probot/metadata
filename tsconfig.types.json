@@ -2,11 +2,14 @@
     "compilerOptions": {
         "skipLibCheck": true,
         "declaration": true,
-        "noEmit": true,
+        "noEmit": false,
+        "emitDeclarationOnly": true,
         "strict": true,
         "strictNullChecks": true,
+        "outFile": "./index.d.ts",
         "allowJs": true,
         "checkJs": true,
         "esModuleInterop": true,
-    }
+    },
+    "include": ["index.js"]
 }
