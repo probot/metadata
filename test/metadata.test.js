@@ -8,7 +8,6 @@ nock.disableNetConnect()
 /** @typedef {import('@octokit/webhooks').EmitterWebhookEvent<'issue_comment'>} IssueCommentEvent */
 /** @typedef {import('node:test').TestContext} TestContext */
 
-
 describe('metadata', () => {
   /** @type {import('probot').Context} */
   let context
