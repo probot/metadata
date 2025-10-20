@@ -5,26 +5,26 @@ A [Probot](https://github.com/probot/probot) extension to store metadata on Issu
 ## Usage
 
 ```js
-const metadata = require('probot-metadata');
+import metadata from "probot-metadata";
 
 // where `context` is a Probot `Context`
-await metadata(context).set(key, value)
+await metadata(context).set(key, value);
 
-const value = await metadata(context).get(key)
+const value = await metadata(context).get(key);
 ```
 
 ## Example
 
 ```js
-const metadata = require('probot-metadata');
+import metadata from "probot-metadata";
 
-module.exports = robot => {
-  robot.on('issue_comment.created', async context => {
-    match = context.payload.comment.body.match('/snooze (.*)')
-    if(match) {
-      metadata(context).set('snooze', match[1])
+export default function (robot) {
+  robot.on("issue_comment.created", async (context) => {
+    match = context.payload.comment.body.match("/snooze (.*)");
+    if (match) {
+      metadata(context).set("snooze", match[1]);
     }
-  })
+  });
 }
 ```
 

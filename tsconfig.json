@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "target": "ES2020",
+        "module": "esnext",
+        "lib": [
+            "esnext"
+        ],
+        "types": [
+            "node"
+        ],
+        "noEmit": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "checkJs": true
+    }
+}

@@ -1,5 +1,5 @@
 name: Test
-"on":
+on:
   push:
     branches:
       - master
@@ -8,13 +8,37 @@ name: Test
       - opened
       - synchronize
 jobs:
-  build:
+  test:
+    name: Test on Node.js ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm run test
+
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v5
         with:
-          node-version: 16
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
           cache: npm
-      - run: npm install
-      - run: npm test
+      - name: Install dependencies
+        run: npm install
+      - name: Lint
+        run: npm run lint
