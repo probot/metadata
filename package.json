@@ -23,7 +23,7 @@
     "neostandard": "^0.12.2",
     "nock": "^15.0.0",
     "probot": "^14.0.0",
-    "semantic-release": "^20.0.0"
+    "semantic-release": "^25.0.0"
   },
   "peerDependencies": {
     "probot": ">=14"
