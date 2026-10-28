@@ -18,7 +18,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^24.7.2",
+    "@types/node": "^26.0.0",
     "eslint": "^9.37.0",
     "neostandard": "^0.12.2",
     "nock": "^15.0.0",
